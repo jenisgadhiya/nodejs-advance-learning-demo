@@ -3,10 +3,12 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import cors from "cors";
 import userRoutes from "./routes/userRoutes.js";
+import redisClient from "./service/redisClient.js";
 
 const app = express();
 const PORT = 5000;
 
+redisClient.connect();
 mongoose
   .connect("mongodb://127.0.0.1:27017/redis-demo")
   .then((value) => {

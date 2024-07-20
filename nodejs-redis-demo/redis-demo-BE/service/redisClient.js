@@ -1,10 +1,13 @@
 import redis from "redis";
 
 // Create Redis client
-const redisClient = redis.createClient();
+const redisClient = redis.createClient({
+  host: "127.0.0.1",
+  port: 6379,
+});
 
 redisClient.on("connect", () => {
-  console.log("Connected to Redis");
+  redisClient.flushDb();
 });
 
 redisClient.on("error", (err) => {

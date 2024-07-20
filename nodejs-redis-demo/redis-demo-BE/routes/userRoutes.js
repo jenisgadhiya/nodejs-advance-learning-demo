@@ -27,22 +27,13 @@ router.put("/:id", async (req, res) => {
     text: `User updated: ${updatedUser?.id}`,
   };
   // Check Redis if email was sent recently
-  const lastSentTime = await new Promise((resolve, reject) => {
-    redisClient.get(`user:${updatedUser?.id}`, (err, reply) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(reply);
-      }
-    });
-  });
-
-  console.log("lastSentTime", lastSentTime);
-
+  const lastSentTime = await redisClient.get(`user:${updatedUser?.id}`);
   // If email was sent less than a minute ago, do not send again
   if (!lastSentTime || Date.now() - parseInt(lastSentTime, 10) > 60000) {
     sendEmail(mailOptions); // Send email
-    redisClient.set(`user:${updatedUser?.id}`, Date.now()); // Set current time in Redis
+    redisClient.set(`user:${updatedUser?.id}`, Date.now(), {
+      EX: 60,
+    });
   }
   res.send(updatedUser);
 });
